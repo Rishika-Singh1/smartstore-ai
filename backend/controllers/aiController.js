@@ -5,9 +5,27 @@ const Product = require('../models/Product');
 // Gemini Setup
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
-});
+// Helper function to generate content with retry and fallback models to prevent failure due to 404, 429, or 503 errors
+const generateContentWithRetry = async (prompt) => {
+  const models = ['gemini-3.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite'];
+  let lastError;
+
+  for (const modelName of models) {
+    try {
+      const modelInstance = genAI.getGenerativeModel({ model: modelName });
+      const result = await modelInstance.generateContent(prompt);
+      return result;
+    } catch (err) {
+      console.error(`Failed to generate content with ${modelName}:`, err.message);
+      lastError = err;
+      // Sleep for a short duration if we hit a rate limit or service unavailable before trying next model
+      if (err.message.includes('429') || err.message.includes('503')) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+  }
+  throw lastError;
+};
 
 // @route   POST /api/ai/generate-content
 // @desc    Generate product content using AI
@@ -52,7 +70,7 @@ Return ONLY valid JSON in this exact format:
 }
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateContentWithRetry(prompt);
 
     const response = await result.response;
 
@@ -154,7 +172,7 @@ Return ONLY valid JSON:
 }
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateContentWithRetry(prompt);
 
     const response = await result.response;
 

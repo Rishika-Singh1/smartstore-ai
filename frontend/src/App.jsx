@@ -20,6 +20,7 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import AIContent from './pages/AIContent';
 import AIInsights from './pages/AIInsights';
+import SalesManager from './pages/SalesManager';
 
 // Protected Route
 const PrivateRoute = ({ children }) => {
@@ -163,6 +164,11 @@ export default function App() {
             <Route
               path="products"
               element={<Products />}
+            />
+
+            <Route
+              path="sales-manager"
+              element={<SalesManager />}
             />
 
             <Route

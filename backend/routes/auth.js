@@ -1,8 +1,23 @@
 const express = require('express');
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Route working ✅' });
-});
+const {
+  register,
+  login,
+  getMe,
+} = require('../controllers/authController');
+
+const {
+  protect,
+} = require('../middleware/auth');
+
+// Public Routes
+router.post('/register', register);
+
+router.post('/login', login);
+
+// Private Routes
+router.get('/me', protect, getMe);
 
 module.exports = router;

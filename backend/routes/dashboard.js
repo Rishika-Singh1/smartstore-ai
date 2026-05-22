@@ -1,8 +1,16 @@
 const express = require('express');
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Route working ✅' });
-});
+const {
+  getStats,
+} = require('../controllers/dashboardController');
+
+const {
+  protect,
+} = require('../middleware/auth');
+
+// Dashboard Statistics
+router.get('/stats', protect, getStats);
 
 module.exports = router;

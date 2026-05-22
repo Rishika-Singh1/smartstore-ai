@@ -172,9 +172,11 @@ const updateProduct = async (req, res) => {
     if (stock !== undefined) product.stock = parseInt(stock);
     if (description !== undefined) product.description = description;
     if (aiCaption !== undefined) product.aiCaption = aiCaption;
-    if (revenue !== undefined) product.revenue = revenue;
-    if (unitsSold !== undefined) product.unitsSold = unitsSold;
+    if (unitsSold !== undefined) product.unitsSold = parseInt(unitsSold) || 0;
     if (imageUrl !== undefined) product.imageUrl = imageUrl;
+
+    // Automatically recalculate revenue based on unitsSold and price
+    product.revenue = product.unitsSold * product.price;
 
     if (tags !== undefined) {
 
